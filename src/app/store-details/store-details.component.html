@@ -1,0 +1,62 @@
+<app-file-upload (csvData)="getCsvData($event)"></app-file-upload>
+
+<div *ngIf="dataSource.data.length > 0">
+    <mat-form-field style="width: 40%">
+        <mat-label>Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #input>
+    </mat-form-field>
+    <mat-table #table [dataSource]="dataSource">
+        <ng-container [matColumnDef]="col.key" *ngFor="let col of columnsSchema">
+            <mat-header-cell *matHeaderCellDef>
+                {{ col.label }}
+            </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+                <div [ngSwitch]="col.type" *ngIf="!element.isEdit">
+                    <div class="btn-edit" *ngSwitchCase="'isEdit'">
+                        <button mat-icon-button class="material-icons app-toolbar-menu save-button" matTooltip="Edit"
+                            color="primary" (click)="element.isEdit = !element.isEdit">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button class="material-icons app-toolbar-menu delete-button"
+                            (click)="removeRow(element.store_id)" matTooltip="Delete" color="warn">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                    <span *ngSwitchCase="'date'">
+                        {{ element[col.key] | date: 'mediumDate' }}
+                    </span>
+                    <span *ngSwitchDefault>
+                        {{ element[col.key] }}
+                    </span>
+                </div>
+                <div [ngSwitch]="col.type" *ngIf="element.isEdit">
+                    <div *ngSwitchCase="'isSelected'"></div>
+                    <div class="btn-edit" *ngSwitchCase="'isEdit'">
+                        <button mat-icon-button class="material-icons app-toolbar-menu save-button"
+                            matTooltip="Save Changes" (click)="editRow(element)" color="primary"
+                            [disabled]="disableSubmit(element.store_id)">
+                            <mat-icon>check_circle</mat-icon>
+                        </button>
+                    </div>
+                    <mat-form-field class="form-input" *ngSwitchCase="'date'" appearance="fill">
+                        <mat-label>Choose a date</mat-label>
+                        <input matInput [matDatepicker]="picker" [(ngModel)]="element[col.key]" />
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <ng-container *ngIf="col.type else notEditable">
+                        <mat-form-field class="form-input" *ngSwitchDefault>
+                            <input matInput [required]="col.required" [pattern]="col.pattern" [type]="col.type"
+                                [(ngModel)]="element[col.key]" (change)="inputHandler($event, element.store_id, col.key)" />
+                        </mat-form-field>
+                    </ng-container>
+                    <ng-template #notEditable>
+                        <span>{{ element[col.key] }}</span>
+                    </ng-template>
+                </div>
+            </mat-cell>
+        </ng-container>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
+</div>

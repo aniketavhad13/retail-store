@@ -1,0 +1,12 @@
+<form id="file-upload-form" class="uploader">
+    <input (change)="onChange($event)" #inputFile id="file-upload" type="file" name="fileUpload" accept=".csv" />
+
+    <label for="file-upload" id="file-drag">
+        <div id="start">
+            <i class="fa fa-download" aria-hidden="true"></i>
+            <div>Select a file</div>
+            <span id="file-upload-btn" class="btn btn-primary">Select a file</span>
+        </div>
+        <b *ngIf="fileName">FileName :</b> {{fileName}}
+    </label>
+</form>
